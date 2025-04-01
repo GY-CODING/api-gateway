@@ -9,9 +9,14 @@ pipeline {
         stage('Deploy to Render') {
             steps {
                 script {
-                    sh '''
-                        curl 
-                    '''
+                    def response = httpRequest url: '${KOYEB_SERVICE_ID}'
+                    echo "Response: ${response.content}"
+                    
+                    def jsonResponse = readJSON text: response.content
+                    
+                    if (jsonResponse.status != 'success') {
+                        error("Deployment failed: ${jsonResponse.status}")
+                    }
                 }
             }
         }
