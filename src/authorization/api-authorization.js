@@ -3,17 +3,17 @@ const log = require("../logging/logger.js");
 const LogLevel = require("../entities/log-levels.js");
 const getUserId = require("./util/jwt-decoder.js");
 
-async function getManagementApiToken(env) {
-    const url = env.AUTH0_TOKEN_URL;
+async function getManagementApiToken() {
+    const url = process.env.AUTH0_TOKEN_URL;
     const response = await fetch(url, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            client_id: env.AUTH0_CLIENTID,
-            client_secret: env.AUTH0_SECRET,
-            audience: env.AUTH0_AUDIENCE_URL,
+            client_id: process.env.AUTH0_CLIENTID,
+            client_secret: process.env.AUTH0_SECRET,
+            audience: process.env.AUTH0_AUDIENCE_URL,
             grant_type: 'client_credentials'
         })
     });
@@ -26,9 +26,9 @@ async function getManagementApiToken(env) {
     return data.access_token;
 }
 
-async function getUserRoles(userID, env) {
-    const accessToken   = await getManagementApiToken(env);
-    const url           = `${env.AUTH0_USERDATA_URL}${userID}`;
+async function getUserRoles(userID) {
+    const accessToken   = await getManagementApiToken();
+    const url           = `${process.env.AUTH0_USERDATA_URL}${userID}`;
 
     const response = await fetch(url, {
         method: 'GET',
@@ -46,9 +46,9 @@ async function getUserRoles(userID, env) {
     return userData.user_metadata.profile.roles;
 }
 
-async function getUserApiKey(userID, env) {
-    const accessToken   = await getManagementApiToken(env);
-    const url           = `${env.AUTH0_USERDATA_URL}${userID}`;
+async function getUserApiKey(userID) {
+    const accessToken   = await getManagementApiToken();
+    const url           = `${process.env.AUTH0_USERDATA_URL}${userID}`;
 
     const response = await fetch(url, {
         method: 'GET',
@@ -66,7 +66,7 @@ async function getUserApiKey(userID, env) {
     return userData.user_metadata.profile.apiKey;
 }
 
-async function checkRoles(userID, pathRoles, env) {
+async function checkRoles(userID, pathRoles) {
     pathRoles = pathRoles.split(',');
 
     let userRoles;
@@ -80,13 +80,13 @@ async function checkRoles(userID, pathRoles, env) {
     );
 
     try {
-        userRoles = await getUserRoles(userID, env);
+        userRoles = await getUserRoles(userID);
     } catch(error) {
         switch(error.message) {
             case "404":
-                log(LogLevel.ERROR, { message: "No roles were found for this user." }, env)
+                log(LogLevel.ERROR, { message: "No roles were found for this user." })
             case "500":
-                log(LogLevel.ERROR, { message: "An error with the authentication service has occurred." }, env)
+                log(LogLevel.ERROR, { message: "An error with the authentication service has occurred." })
                 return new Response(
                     new ApiException(
                         "AUTH_ERROR",
@@ -96,7 +96,7 @@ async function checkRoles(userID, pathRoles, env) {
                     { status: 500 }
                 );
             default:
-                log(LogLevel.ERROR, { message: "An internal API Gateway error has occurred." }, env)
+                log(LogLevel.ERROR, { message: "An internal API Gateway error has occurred." })
                 return new Response(
                     new ApiException(
                         "GATEWAY_ERROR",
@@ -111,7 +111,7 @@ async function checkRoles(userID, pathRoles, env) {
     pathRoles.forEach(role => {
         userRoles.forEach(userRole => {
             if(userRole === role) {
-                log(LogLevel.INFO, { message: "User roles to access the resource were found." }, env)
+                log(LogLevel.INFO, { message: "User roles to access the resource were found." })
                 response = new Response(
                     "User roles to access this endpoint are present.",
                     { status: 200 }
@@ -123,9 +123,9 @@ async function checkRoles(userID, pathRoles, env) {
     return response
 }
 
-async function checkSession(authorization, env) {
+async function checkSession(authorization) {
     try {
-        const userID = await getUserId(authorization, env);
+        const userID = await getUserId(authorization);
 
         let response = new Response(
             "User session is valid.",
@@ -134,11 +134,11 @@ async function checkSession(authorization, env) {
 
         response.headers.append('user-id', userID);
 
-        log(LogLevel.INFO, { message: "User has been successfully authenticated.", authorization: authorization, userId: userID }, env)
+        log(LogLevel.INFO, { message: "User has been successfully authenticated.", authorization: authorization, userId: userID })
         return response;
     } catch(error) {
         if(error.message === "INVALID_TOKEN") {
-            log(LogLevel.ERROR, { message: "The authentication token is malformed or expired.", error: error.message }, env)
+            log(LogLevel.ERROR, { message: "The authentication token is malformed or expired.", error: error.message })
 
             return new Response(
                 new ApiException(
@@ -149,7 +149,7 @@ async function checkSession(authorization, env) {
                 { status: 401 }
             );
         } else if(error.message === "INVALID_API_KEY") {
-            log(LogLevel.ERROR, { message: "The API Key is malformed.", error: error.message }, env)
+            log(LogLevel.ERROR, { message: "The API Key is malformed.", error: error.message })
 
             return new Response(
                 new ApiException(
@@ -160,7 +160,7 @@ async function checkSession(authorization, env) {
                 { status: 401 }
             );
         } else {
-            log(LogLevel.ERROR, { message: "An error with the authentication service has occurred." }, env)
+            log(LogLevel.ERROR, { message: "An error with the authentication service has occurred." })
             
             return new Response(
                 new ApiException(

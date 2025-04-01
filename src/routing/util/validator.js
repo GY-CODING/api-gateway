@@ -1,5 +1,4 @@
 const ApiException = require('../../entities/api-exception.js');
-const { fetchAPIRoutes, fetchAPIDocs } = require('./apidocs-fetcher.js');
 
 function validateRequestConfig(request, route) {
     const service   = "/" + request.url.split('/').slice(3)[0];
@@ -70,22 +69,8 @@ function validateRequestConfig(request, route) {
     );
 }
 
-module.exports = async function validateRequest(request, env) {
+module.exports = async function validateRequest(request, routes) {
     const path = "/" + request.url.split('/').slice(4).join('/').split('?')[0];
-    let routes = null;
-
-    try {
-        routes = await fetchAPIRoutes(env);
-    } catch (error) {
-        return new Response(
-            new ApiException(
-                "GATEWAY_ERROR",
-                `An internal API Gateway error has occurred, sorry for the inconvenience.`,
-                500
-            ).toJSON(),
-            { status: 500 }
-        );
-    }
 
     let routeFound = routes
         .filter(routeObject => {

@@ -1,26 +1,26 @@
 const ApiException = require('../../entities/api-exception.js');
 
-function buildPath(request, env) {
+function buildPath(request) {
     const endpoint      = request.url.split('/').slice(4).join('/');
     const service       = "/" + request.url.split('/').slice(3)[0];
 
     switch(service) {
-        case env.FALL_OF_THE_GODS_PATH:
-            return `${env.FALL_OF_THE_GODS_URL}/${endpoint}`;
-        case env.ACCOUNTS_PATH:
-            return `${env.ACCOUNTS_URL}/${endpoint}`;
-        case env.MESSAGES_PATH:
-            return `${env.MESSAGES_URL}/${endpoint}`;
+        case process.env.FALL_OF_THE_GODS_PATH:
+            return `${process.env.FALL_OF_THE_GODS_URL}/${endpoint}`;
+        case process.env.ACCOUNTS_PATH:
+            return `${process.env.ACCOUNTS_URL}/${endpoint}`;
+        case process.env.MESSAGES_PATH:
+            return `${process.env.MESSAGES_URL}/${endpoint}`;
         default:
             throw new Error();
     }
 }
 
-module.exports = async function getResponse(request, env, userID = undefined) {
+module.exports = async function getResponse(request, userID = undefined) {
     let path = null;
 
     try {
-        path = buildPath(request, env);
+        path = buildPath(request);
     } catch (error) {
         return new Response(
             new ApiException(
@@ -41,7 +41,7 @@ module.exports = async function getResponse(request, env, userID = undefined) {
         newHeaders.append('Content-Type', request.headers.get('Content-Type'));
     }
 
-    newHeaders.append('x-api-key', env.SERVICE_API_KEY);
+    newHeaders.append('x-api-key', process.env.SERVICE_API_KEY);
 
     const response = await fetch(path, {
         method: request.method,

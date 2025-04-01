@@ -11,11 +11,11 @@ function getParameter(ref, components) {
     }
 }
 
-async function fetchAPIRoutes(env) {
+async function fetchAPIRoutes() {
     const apiDocsServicesPaths = [
-        env.FALL_OF_THE_GODS_DOCS_PATH,
-        env.ACCOUNTS_DOCS_PATH,
-        env.MESSAGES_DOCS_PATH
+        process.env.FALL_OF_THE_GODS_DOCS_PATH,
+        process.env.ACCOUNTS_DOCS_PATH,
+        process.env.MESSAGES_DOCS_PATH
     ];
 
     const routes = new Array();
@@ -64,7 +64,7 @@ async function fetchAPIRoutes(env) {
     return routes;
 }
 
-async function fetchAPIDocs() {    
+async function fetchAPIDocs(service) {    
     const client = new MongoClient("mongodb+srv://gycoding:iggycoding-05@fallofthegods.zsllqn9.mongodb.net/");
     await client.connect();
     
@@ -73,9 +73,7 @@ async function fetchAPIDocs() {
     
     const url = new URL(request.url);
 
-    const docs = await collection.findMany({ });
-    await client.close();
-
+    const docs = await collection.find({ service }).toArray();
     return docs;
 }
 

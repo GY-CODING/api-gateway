@@ -1,6 +1,6 @@
-module.exports = function log(level, data, env) {
+module.exports = function log(level, data) {
     var myHeaders = new Headers();
-    myHeaders.append("Authorization", env.LOGS_AUTH_TOKEN);
+    myHeaders.append("Authorization", process.env.LOGS_AUTH_TOKEN);
 
     var raw = JSON.stringify({
         "level": level,
@@ -15,7 +15,7 @@ module.exports = function log(level, data, env) {
         redirect: 'follow'
     };
 
-    fetch(env.LOGS_URL, requestOptions)
+    fetch(process.env.LOGS_URL, requestOptions)
         .then(response => response.text())
         .then(result => console.log(result))
         .catch(error => console.log('error', error));

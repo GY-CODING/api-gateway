@@ -1,16 +1,16 @@
-module.exports = async function getUserId(authorization, env) {
+module.exports = async function getUserId(authorization) {
     const tokenRegex = /Bearer\s([a-zA-Z0-9\.\-_]+)/;
     
     if(tokenRegex.test(authorization)) {
-        return await getUserIdFromToken(authorization, env)
+        return await getUserIdFromToken(authorization)
     } else {
-        return await getUserIdFromAPIKey(authorization, env)
+        return await getUserIdFromAPIKey(authorization)
     }
 }
 
-async function getUserIdFromToken(token, env) {
+async function getUserIdFromToken(token) {
     try {
-        const userInfoResponse = await fetch(env.AUTH0_USERINFO_URL, {
+        const userInfoResponse = await fetch(process.env.AUTH0_USERINFO_URL, {
             method: 'GET',
             headers: {
                 'Authorization': `${token}`,
@@ -26,9 +26,9 @@ async function getUserIdFromToken(token, env) {
     }
 }
 
-async function getUserIdFromAPIKey(apiKey, env) {
+async function getUserIdFromAPIKey(apiKey) {
     try {
-        const userIdResponse = await fetch(`${env.ACCOUNTS_URL}/user/metadata/apikey/decode?key=${apiKey}`, {
+        const userIdResponse = await fetch(`${process.env.ACCOUNTS_URL}/user/metadata/apikey/decode?key=${apiKey}`, {
             method: 'GET',
             headers: {
                 'x-api-key': env.SERVICE_API_KEY
