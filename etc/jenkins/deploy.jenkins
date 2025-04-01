@@ -11,7 +11,7 @@ pipeline {
             steps {
                 script {
                     sh 'curl --location --request GET "${RENDER_DEPLOY_HOOK}"'
-                    
+
                     def deployFinished = false
                     def maxRetries = 30
                     def retryCount = 0
@@ -19,13 +19,12 @@ pipeline {
                     while (!deployFinished && retryCount < maxRetries) {
                         retryCount++
                         
-                        def deployStatusResponse = sh(script: "curl --silent --location --request GET https://api.render.com/v1/services/${RENDER_SERVICE_ID}", returnStdout: true).trim()
-                        def deployStatus = readJSON text: deployStatusResponse
+                        def deployStatusResponse = sh(script: "curl --silent --location --request GET https://api.render.com/v1/services/${RENDER_SERVICE_ID} | jq -r '.state'", returnStdout: true).trim()
 
-                        if (deployStatus.state == 'succeeded') {
+                        if (deployStatusResponse == 'succeeded') {
                             deployFinished = true
                             echo "Deployment finished successfully."
-                        } else if (deployStatus.state == 'failed') {
+                        } else if (deployStatusResponse == 'failed') {
                             error "Deployment failed on Render."
                         } else {
                             echo "Deployment in progress... Retry #${retryCount}"
