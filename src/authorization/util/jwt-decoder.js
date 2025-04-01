@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 module.exports = async function getUserId(authorization) {
     const tokenRegex = /Bearer\s([a-zA-Z0-9\.\-_]+)/;
     

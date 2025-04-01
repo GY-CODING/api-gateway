@@ -1,8 +1,10 @@
 const ApiException = require('../../entities/api-exception.js');
 
+require('dotenv').config();
+
 function buildPath(request) {
-    const endpoint      = request.url.split('/').slice(4).join('/');
-    const service       = "/" + request.url.split('/').slice(3)[0];
+    const endpoint      = request.url.split('/').slice(2).join('/');
+    const service       = "/" + request.url.split('/').slice(1)[0];
 
     switch(service) {
         case process.env.FALL_OF_THE_GODS_PATH:
@@ -51,5 +53,5 @@ module.exports = async function getResponse(request, userID = undefined) {
 
     // Here we should check the response and filter any non-formatted error to a SERVER_ERROR.
 
-    return response;
+    return await response.json();
 }

@@ -2,6 +2,8 @@ const { checkSession, checkRoles } = require('../authorization/api-authorization
 const getResponse = require('./util/service-fetcher.js');
 const validateRequest = require('./util/validator.js');
 
+require('dotenv').config();
+
 module.exports = async function routeRequest(request, routes) {
     let authorization = "";
 

@@ -3,6 +3,8 @@ const log = require("../logging/logger.js");
 const LogLevel = require("../entities/log-levels.js");
 const getUserId = require("./util/jwt-decoder.js");
 
+require('dotenv').config();
+
 async function getManagementApiToken() {
     const url = process.env.AUTH0_TOKEN_URL;
     const response = await fetch(url, {

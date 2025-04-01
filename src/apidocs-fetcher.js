@@ -1,7 +1,8 @@
 const yaml = require('js-yaml');
 const { MongoClient } = require('mongodb');
-const Route = require('../../entities/route.js');
+const Route = require('./entities/route.js');
 
+require('dotenv').config();
 
 function getParameter(ref, components) {
     const parameter = ref.replace(/^#\//, '').split('/').pop();
@@ -70,8 +71,6 @@ async function fetchAPIDocs(service) {
     
     const db = client.db("APIGateway");
     const collection = db.collection("APIDocs");
-    
-    const url = new URL(request.url);
 
     const docs = await collection.find({ service }).toArray();
     return docs;

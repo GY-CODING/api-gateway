@@ -1,7 +1,9 @@
 const ApiException = require('../../entities/api-exception.js');
 
+require('dotenv').config();
+
 function validateRequestConfig(request, route) {
-    const service   = "/" + request.url.split('/').slice(3)[0];
+    const service   = "/" + request.url.split('/').slice(1)[0];
     let params      = null;
 
     if (route.method !== request.method) {
@@ -14,9 +16,10 @@ function validateRequestConfig(request, route) {
             { status: 405 }
         );
     }
+    
+    if (request.url.split('?').length > 1) {
 
-    if (request.url.split('/').slice(4).join('/').split('?').length > 1) {
-        params = request.url.split('/').slice(4).join('/').split('?')[1].split('&');
+        params = request.url.split('?')[1].split('&');
 
         let paramNames = new Array();
 
@@ -70,7 +73,7 @@ function validateRequestConfig(request, route) {
 }
 
 module.exports = async function validateRequest(request, routes) {
-    const path = "/" + request.url.split('/').slice(4).join('/').split('?')[0];
+    const path = "/" + request.url.split('/').slice(2).join('/').split('?')[0];
 
     let routeFound = routes
         .filter(routeObject => {

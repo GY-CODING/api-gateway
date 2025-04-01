@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 module.exports = function log(level, data) {
     var myHeaders = new Headers();
     myHeaders.append("Authorization", process.env.LOGS_AUTH_TOKEN);
