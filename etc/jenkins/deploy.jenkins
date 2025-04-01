@@ -9,14 +9,7 @@ pipeline {
         stage('Deploy to Render') {
             steps {
                 script {
-                    def response = sh(script: "curl --location --request GET '${RENDER_DEPLOY_HOOK}'", returnStdout: true).trim()
-                    echo "Response: ${response}"
-                    
-                    def jsonResponse = readJSON text: response
-                    
-                    if (jsonResponse.status != 'success') {
-                        error("Deployment failed: ${jsonResponse.status}")
-                    }
+                    sh'curl --location --request GET "${RENDER_DEPLOY_HOOK}"'
                 }
             }
         }
