@@ -51,7 +51,7 @@ module.exports = async function getResponse(request, userID = undefined) {
     const response = await fetch(path, {
         method: request.method,
         headers: newHeaders,
-        body: request.body
+        body: JSON.stringify(request.body)
     });
 
     // Here we should check the response and filter any non-formatted error to a SERVER_ERROR.
