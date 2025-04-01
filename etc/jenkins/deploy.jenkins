@@ -9,12 +9,7 @@ pipeline {
         stage('Deploy to Render') {
             steps {
                 script {
-                    def deployUrl = env.DEPLOY_URL
-                    if (!deployUrl) {
-                        error("DEPLOY_URL environment variable is not set")
-                    }
-                    
-                    def response = sh(script: "curl -s ${deployUrl}", returnStdout: true).trim()
+                    def response = sh(script: "curl -s ${RENDER_DEPLOY_HOOK}", returnStdout: true).trim()
                     echo "Response: ${response}"
                     
                     def jsonResponse = readJSON text: response
