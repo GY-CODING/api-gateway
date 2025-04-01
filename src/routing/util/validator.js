@@ -7,14 +7,14 @@ function validateRequestConfig(request, route) {
     let params      = null;
 
     if (route.method !== request.method) {
-        return new Response(
-            new ApiException(
+        return {
+            status: 405,
+            body: new ApiException(
                 "METHOD_NOT_ALLOWED",
                 `Method used to access this resource is not allowed.`,
                 405
-            ).toJSON(),
-            { status: 405 }
-        );
+            ).toJSON()
+        }
     }
     
     if (request.url.split('?').length > 1) {
@@ -34,42 +34,41 @@ function validateRequestConfig(request, route) {
                 }
             });
         } catch (error) {
-            console.error(error);
-            return new Response(
-                new ApiException(
+            return {
+                status: 400,
+                body: new ApiException(
                     "BAD_REQUEST",
                     `One of the request query parameters is not present or mispelled: ${error.message}`,
                     400
-                ).toJSON(),
-                { status: 400 }
-            );
+                ).toJSON()
+            }
         }
     }
 
     if (route.service !== service) {
-        return new Response(
-            new ApiException(
+        return {
+            status: 400,
+            body: new ApiException(
                 "BAD_REQUEST",
                 `The service is not valid for the requested resource.`,
                 400
-            ).toJSON(),
-            { status: 400 }
-        );
+            ).toJSON()
+        }
     }
 
     for (const header of route.headers) {
         if (header.name === "Authorization") {
-            return new Response(
-                route.roles,
-                { status: 401 }
-            );
+            return {
+                status: 401,
+                body: route.roles
+            }
         }
     }
 
-    return new Response(
-        "Request is valid.",
-        { status: 200 }
-    );
+    return {
+        status: 200,
+        body: 'Request validated.'
+    }
 }
 
 module.exports = async function validateRequest(request, routes) {
@@ -85,14 +84,14 @@ module.exports = async function validateRequest(request, routes) {
         });
 
     if (routeFound === undefined) {
-        return new Response(
-            new ApiException(
+        return {
+            status: 404,
+            body: new ApiException(
                 "RESOURCE_NOT_FOUND",
                 `This resource was not found.`,
                 404
-            ).toJSON(),
-            { status: 404 }
-        );
+            ).toJSON()
+        }
     }
     
     return validateRequestConfig(request, routeFound);

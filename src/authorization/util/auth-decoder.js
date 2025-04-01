@@ -33,7 +33,7 @@ async function getUserIdFromAPIKey(apiKey) {
         const userIdResponse = await fetch(`${process.env.ACCOUNTS_URL}/user/metadata/apikey/decode?key=${apiKey}`, {
             method: 'GET',
             headers: {
-                'x-api-key': env.SERVICE_API_KEY
+                'x-api-key': process.env.SERVICE_API_KEY
             }
         });
     

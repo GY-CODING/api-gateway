@@ -1,4 +1,5 @@
 const ApiException = require('../../entities/api-exception.js');
+const Log = require('../../logging/logger.js');
 
 require('dotenv').config();
 
@@ -24,14 +25,16 @@ module.exports = async function getResponse(request, userID = undefined) {
     try {
         path = buildPath(request);
     } catch (error) {
-        return new Response(
-            new ApiException(
+        Log.error({ message: `Error building path: ${error.message}`});
+
+        return {
+            status: 500,
+            body: new ApiException(
                 "GATEWAY_ERROR",
                 `An internal API Gateway error has occurred, sorry for the inconvenience.`,
                 500
-            ).toJSON(),
-            { status: 500 }
-        );
+            ).toJSON()
+        }
     }
 
     let newHeaders = new Headers();
@@ -40,7 +43,7 @@ module.exports = async function getResponse(request, userID = undefined) {
         newHeaders = new Headers(request.headers);
     } else {
         newHeaders.append('x-user-id', userID);
-        newHeaders.append('Content-Type', request.headers.get('Content-Type'));
+        newHeaders.append('Content-Type', request.headers['Content-Type']);
     }
 
     newHeaders.append('x-api-key', process.env.SERVICE_API_KEY);
@@ -53,5 +56,8 @@ module.exports = async function getResponse(request, userID = undefined) {
 
     // Here we should check the response and filter any non-formatted error to a SERVER_ERROR.
 
-    return await response.json();
+    return {
+        status: response.status,
+        body: await response.json()
+    };
 }

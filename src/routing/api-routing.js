@@ -8,7 +8,7 @@ module.exports = async function routeRequest(request, routes) {
     let authorization = "";
 
     try {
-        authorization = request.headers.get('Authorization');
+        authorization = request.headers.authorization;
     } catch (error) {
         authorization = null;
     }
@@ -18,14 +18,17 @@ module.exports = async function routeRequest(request, routes) {
     if (requestValidationResponse.status === 401) {
         const sessionCheckResponse = await checkSession(authorization);
 
-        if (!sessionCheckResponse.ok) {
+        if (sessionCheckResponse.status !== 200) {
             return sessionCheckResponse;
         }
 
-        const userID = sessionCheckResponse.headers.get('user-id');
-        const rolesCheckResponse = await checkRoles(userID, await requestValidationResponse.text());
+        const userID = await sessionCheckResponse.body;
+        const rolesCheckResponse = await checkRoles(
+            userID, 
+            await requestValidationResponse.body
+        );
 
-        if (!rolesCheckResponse.ok) {
+        if (rolesCheckResponse.status !== 200) {
             return rolesCheckResponse;
         }
 
