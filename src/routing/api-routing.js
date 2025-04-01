@@ -25,7 +25,7 @@ app.all(process.env.FALL_OF_THE_GODS_PATH, async (req, res) => {
         );
     }
 
-    res.send(route(req), routes);
+    res.send(routeRequest(req), routes);
 });
 
 app.all(process.env.ACCOUNTS_PATH, async (req, res) => {
@@ -44,7 +44,7 @@ app.all(process.env.ACCOUNTS_PATH, async (req, res) => {
         );
     }
 
-    res.send(route(req))
+    res.send(routeRequest(req))
 });
 
 app.all(process.env.MESSAGES_PATH, async (req, res) => {
@@ -63,10 +63,10 @@ app.all(process.env.MESSAGES_PATH, async (req, res) => {
         );
     }
 
-    res.send(route(req))
+    res.send(routeRequest(req))
 });
 
-async function route(request, routes) {
+async function routeRequest(request, routes) {
     let authorization = "";
 
     try {

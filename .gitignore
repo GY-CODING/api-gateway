@@ -245,3 +245,4 @@ lint/tmp/
 # End of https://mrkandreev.name/snippets/gitignore-generator/#Java,Swift,react,Kotlin,Android
 
 .env
+dist/
