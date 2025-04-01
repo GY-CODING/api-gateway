@@ -54,8 +54,6 @@ module.exports = async function getResponse(request, userID = undefined) {
         body: request.body
     });
 
-    console.log(request.body);
-
     // Here we should check the response and filter any non-formatted error to a SERVER_ERROR.
 
     return {
