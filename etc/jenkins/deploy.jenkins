@@ -6,26 +6,12 @@ pipeline {
     }
 
     stages {
-        stage('Login to Koyeb') {
+        stage('Deploy to Render') {
             steps {
                 script {
-                    def bearerToken = sh(script: '''
-                        response=$(curl -s -X POST "https://app.koyeb.com/v1/account/login" \
-                        -H "Content-Type: application/json" \
-                        -d '{
-                            "email": "'"${KOYEB_EMAIL}"'",
-                            "password": "'"${KOYEB_PASSWORD}"'"
-                        }')
-
-                        echo "$response" | jq -r '.token.id'
-                    ''', returnStdout: true).trim()
-
-                    if (!bearerToken || bearerToken == "null") {
-                        error("🚨 ERROR: Wrong Koyeb credentials provided.")
-                    }
-
-                    env.BEARER_TOKEN = bearerToken
-                    echo "✅ Successfully loged in to Koyeb."
+                    sh '''
+                        curl 
+                    '''
                 }
             }
         }
