@@ -48,7 +48,7 @@ app.all(`${process.env.ACCOUNTS_PATH}/{*splat}`, async (req, res) => {
     }
 
     const response = await routeRequest(req, routes);
-    console.log(response);
+    
     res.status(response.status).send(response.body);
 });
 

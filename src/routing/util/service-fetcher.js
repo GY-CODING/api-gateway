@@ -43,7 +43,7 @@ module.exports = async function getResponse(request, userID = undefined) {
         newHeaders = new Headers(request.headers);
     } else {
         newHeaders.append('x-user-id', userID);
-        newHeaders.append('Content-Type', request.headers['Content-Type']);
+        newHeaders.append('Content-Type', request.headers['content-type']);
     }
 
     newHeaders.append('x-api-key', process.env.SERVICE_API_KEY);
@@ -53,6 +53,8 @@ module.exports = async function getResponse(request, userID = undefined) {
         headers: newHeaders,
         body: request.body
     });
+
+    console.log(request.body);
 
     // Here we should check the response and filter any non-formatted error to a SERVER_ERROR.
 
