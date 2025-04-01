@@ -10,30 +10,48 @@ pipeline {
         stage('Deploy to Render') {
             steps {
                 script {
-                    sh 'curl --location --request GET "${RENDER_DEPLOY_HOOK}"'
+                    // Usando withCredentials para manejar secretos de manera segura
+                    withCredentials([string(credentialsId: 'RENDER_DEPLOY_HOOK', variable: 'RENDER_DEPLOY_HOOK'),
+                                     string(credentialsId: 'API_GATEWAY_SERVICE_ID', variable: 'RENDER_SERVICE_ID')]) {
 
-                    def deployFinished = false
-                    def maxRetries = 30
-                    def retryCount = 0
+                        // Trigger the deployment
+                        sh 'curl --location --request GET "${RENDER_DEPLOY_HOOK}"'
 
-                    while (!deployFinished && retryCount < maxRetries) {
-                        retryCount++
-                        
-                        def deployStatusResponse = sh(script: "curl --silent --location --request GET https://api.render.com/v1/services/${RENDER_SERVICE_ID} | jq -r '.state'", returnStdout: true).trim()
+                        def deployFinished = false
+                        def maxRetries = 30
+                        def retryCount = 0
 
-                        if (deployStatusResponse == 'succeeded') {
-                            deployFinished = true
-                            echo "Deployment finished successfully."
-                        } else if (deployStatusResponse == 'failed') {
-                            error "Deployment failed on Render."
-                        } else {
-                            echo "Deployment in progress... Retry #${retryCount}"
-                            sleep(time: 30, unit: 'SECONDS')
+                        while (!deployFinished && retryCount < maxRetries) {
+                            retryCount++
+                            
+                            // Obtener estado del despliegue
+                            def deployStatusResponse = sh(script: """
+                                curl --silent --location --request GET https://api.render.com/v1/services/${RENDER_SERVICE_ID} || exit 1
+                            """, returnStdout: true).trim()
+
+                            // Verificar si la respuesta es JSON válida
+                            if (deployStatusResponse.startsWith('{')) {
+                                // Parsear el estado usando jq
+                                def deployStatus = sh(script: "echo '${deployStatusResponse}' | jq -r '.state'", returnStdout: true).trim()
+
+                                // Verificar el estado del despliegue
+                                if (deployStatus == 'succeeded') {
+                                    deployFinished = true
+                                    echo "Deployment finished successfully."
+                                } else if (deployStatus == 'failed') {
+                                    error "Deployment failed on Render."
+                                } else {
+                                    echo "Deployment in progress... Retry #${retryCount}"
+                                    sleep(time: 30, unit: 'SECONDS')
+                                }
+                            } else {
+                                error "Invalid JSON response received from Render API."
+                            }
                         }
-                    }
 
-                    if (!deployFinished) {
-                        error "Deployment did not complete successfully after ${maxRetries} retries."
+                        if (!deployFinished) {
+                            error "Deployment did not complete successfully after ${maxRetries} retries."
+                        }
                     }
                 }
             }
