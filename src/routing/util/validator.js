@@ -13,7 +13,8 @@ function validateRequestConfig(request, route) {
                 "METHOD_NOT_ALLOWED",
                 `Method used to access this resource is not allowed.`,
                 405
-            ).toJSON()
+            ).toJSON(),
+            contentType: "application/json"
         }
     }
     
@@ -40,7 +41,8 @@ function validateRequestConfig(request, route) {
                     "BAD_REQUEST",
                     `One of the request query parameters is not present or mispelled: ${error.message}`,
                     400
-                ).toJSON()
+                ).toJSON(),
+                contentType: "application/json"
             }
         }
     }
@@ -52,7 +54,8 @@ function validateRequestConfig(request, route) {
                 "BAD_REQUEST",
                 `The service is not valid for the requested resource.`,
                 400
-            ).toJSON()
+            ).toJSON(),
+            contentType: "application/json"
         }
     }
 
@@ -90,7 +93,8 @@ module.exports = async function validateRequest(request, routes) {
                 "RESOURCE_NOT_FOUND",
                 `This resource was not found.`,
                 404
-            ).toJSON()
+            ).toJSON(),
+            contentType: "application/json"
         }
     }
     

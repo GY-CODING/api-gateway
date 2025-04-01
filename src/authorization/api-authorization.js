@@ -55,7 +55,8 @@ async function checkRoles(userID, pathRoles) {
             "FORBIDDEN",
             "The user has no permission to access this resource.",
             403
-        ).toJSON()
+        ).toJSON(),
+        contentType: 'application/json'
     }
 
     try {
@@ -73,7 +74,8 @@ async function checkRoles(userID, pathRoles) {
                         "AUTH_ERROR",
                         "An error with the authentication service has occurred, sorry for the inconvenience.",
                         500
-                    ).toJSON()
+                    ).toJSON(),
+                    contentType: 'application/json'
                 }
             default:
                 Log.error({ message: "An internal API Gateway error has occurred." });
@@ -84,7 +86,8 @@ async function checkRoles(userID, pathRoles) {
                         "GATEWAY_ERROR",
                         `An internal API Gateway error has occurred, sorry for the inconvenience.`,
                         500
-                    ).toJSON()
+                    ).toJSON(),
+                    contentType: 'application/json'
                 }
         }
     }

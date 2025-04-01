@@ -29,6 +29,7 @@ app.all(`${process.env.FALL_OF_THE_GODS_PATH}/{*splat}`, async (req, res) => {
 
     const response = await routeRequest(req, routes);
 
+    res.set('Content-Type', response.contentType);
     res.status(response.status).send(response.body);
 });
 
@@ -48,7 +49,8 @@ app.all(`${process.env.ACCOUNTS_PATH}/{*splat}`, async (req, res) => {
     }
 
     const response = await routeRequest(req, routes);
-    
+
+    res.set('Content-Type', response.contentType);
     res.status(response.status).send(response.body);
 });
 
@@ -69,6 +71,7 @@ app.all(`${process.env.MESSAGES_PATH}/{*splat}`, async (req, res) => {
 
     const response = await routeRequest(req, routes);
 
+    res.set('Content-Type', response.contentType);
     res.status(response.status).send(response.body);
 });
 
