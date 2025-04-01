@@ -3,13 +3,39 @@ pipeline {
 
     environment {
         RENDER_DEPLOY_HOOK = credentials('RENDER_DEPLOY_HOOK')
+        RENDER_SERVICE_ID = credentials('API_GATEWAY_SERVICE_ID')
     }
 
     stages {
         stage('Deploy to Render') {
             steps {
                 script {
-                    sh'curl --location --request GET "${RENDER_DEPLOY_HOOK}"'
+                    sh 'curl --location --request GET "${RENDER_DEPLOY_HOOK}"'
+                    
+                    def deployFinished = false
+                    def maxRetries = 30
+                    def retryCount = 0
+
+                    while (!deployFinished && retryCount < maxRetries) {
+                        retryCount++
+                        
+                        def deployStatusResponse = sh(script: "curl --silent --location --request GET https://api.render.com/v1/services/${RENDER_SERVICE_ID}", returnStdout: true).trim()
+                        def deployStatus = readJSON text: deployStatusResponse
+
+                        if (deployStatus.state == 'succeeded') {
+                            deployFinished = true
+                            echo "Deployment finished successfully."
+                        } else if (deployStatus.state == 'failed') {
+                            error "Deployment failed on Render."
+                        } else {
+                            echo "Deployment in progress... Retry #${retryCount}"
+                            sleep(time: 30, unit: 'SECONDS')
+                        }
+                    }
+
+                    if (!deployFinished) {
+                        error "Deployment did not complete successfully after ${maxRetries} retries."
+                    }
                 }
             }
         }
