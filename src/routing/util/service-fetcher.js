@@ -14,6 +14,8 @@ function buildPath(request) {
             return `${process.env.ACCOUNTS_URL}/${endpoint}`;
         case process.env.MESSAGES_PATH:
             return `${process.env.MESSAGES_URL}/${endpoint}`;
+        case process.env.BOOKS_PATH:
+            return `${process.env.BOOKS_URL}/${endpoint}`;
         default:
             throw new Error();
     }

@@ -3,22 +3,22 @@ require('dotenv').config();
 
 module.exports = class Log {
     static info(data) {
-        console.info("[INFO] " + data);
+        console.info("[INFO] " + data.message);
         log(LogLevel.INFO, data);
     }
 
     static error(data) {
-        console.error("[ERROR] " + data);
+        console.error("[ERROR] " + data.message);
         log(LogLevel.ERROR, data);
     }
 
     static warn(data) {
-        console.warn("[WARN] " + data);
+        console.warn("[WARN] " + data.message);
         log(LogLevel.WARN, data);
     }
 
     static debug(data) {
-        console.debug("[DEBUG] " + data);
+        console.debug("[DEBUG] " + data.message);
         log(LogLevel.DEBUG, data);
     }
 }
