@@ -40,7 +40,7 @@ async function getUserRoles(userID) {
     });
 
     if(!response.ok) {
-        Log.error({ message: "An error with the authentication service has occurred: " + response });
+        Log.error({ message: "An error with the authentication service has occurred: " + response.toString() });
         throw new Error("500");
     }
 
