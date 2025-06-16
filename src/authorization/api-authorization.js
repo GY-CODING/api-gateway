@@ -4,6 +4,9 @@ const getUserId = require("./util/auth-decoder.js");
 
 require('dotenv').config();
 
+let cachedToken = null;
+let tokenExpiry = null;
+
 async function getManagementApiToken() {
     const url = process.env.AUTH0_TOKEN_URL;
     const response = await fetch(url, {
@@ -23,8 +26,16 @@ async function getManagementApiToken() {
         throw new Error("500");
     }
 
+    const now = Date.now();
+
+    if (cachedToken && now < tokenExpiry) {
+      return cachedToken;
+    }
+
     const data = await response.json();
-    return data.access_token;
+    cachedToken = data.access_token;
+    tokenExpiry = now + (data.expires_in * 1000) - 60 * 1000;
+    return cachedToken;
 }
 
 async function getUserRoles(userID) {

@@ -51,11 +51,18 @@ module.exports = async function getResponse(request, userID = undefined) {
 
     newHeaders.append('x-api-key', process.env.SERVICE_API_KEY);
 
-    const response = await fetch(path, {
-        method: request.method,
-        headers: newHeaders,
-        body: JSON.stringify(request.body)
-    });
+    let response;
+
+    try {
+        response = await fetch(path, {
+            method: request.method,
+            headers: newHeaders,
+            body: JSON.stringify(request.body)
+        });
+    } catch (error) {
+        Log.error({ message: "An error with the authentication service has occurred: " + newHeaders.entries() });
+        throw new Error("500");
+    }
 
     // Here we should check the response and filter any non-formatted error to a SERVER_ERROR.
     
