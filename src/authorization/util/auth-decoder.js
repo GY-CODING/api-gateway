@@ -1,3 +1,6 @@
+const jwt = require('jsonwebtoken');
+const { getManagementClient } = require('./auth0-client');
+
 require('dotenv').config();
 
 module.exports = async function getUserId(authorization) {
@@ -10,20 +13,24 @@ module.exports = async function getUserId(authorization) {
     }
 }
 
-async function getUserIdFromToken(token) {
+async function getUserIdFromToken(authorization) {
     try {
-        const userInfoResponse = await fetch(process.env.AUTH0_USERINFO_URL, {
-            method: 'GET',
-            headers: {
-                'Authorization': `${token}`,
-                'Content-Type': 'application/json'
-            }
-        });
-    
-        const userInfo = await userInfoResponse.json();
-    
-        return userInfo.sub;
+        const token = authorization.split(' ')[1];
+        const decodedToken = jwt.decode(token);
+
+        if (!decodedToken || !decodedToken.sub) {
+            throw new Error("INVALID_TOKEN");
+        }
+
+        await getManagementClient().users.get({ id: decodedToken.sub });
+        
+        return decodedToken.sub;
     } catch(error) {
+        console.log(error);
+        if (error.message === "INVALID_TOKEN") {
+            throw error;
+        }
+
         throw new Error("INVALID_TOKEN");
     }
 }
@@ -36,8 +43,10 @@ async function getUserIdFromAPIKey(apiKey) {
                 'x-api-key': process.env.SERVICE_API_KEY
             }
         });
+
+        const userId = await userIdResponse.text();
     
-        return await userIdResponse.text();
+        return userId;
     } catch(error) {
         throw new Error("INVALID_API_KEY");
     }

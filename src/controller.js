@@ -12,11 +12,11 @@ app.all("/health", (req, res) => {
     res.send("UP");
 });
 
-app.all(`${process.env.FALL_OF_THE_GODS_PATH}/{*splat}`, async (req, res) => {
+app.all(`${process.env.HERALDS_OF_CHAOS_PATH}/{*splat}`, async (req, res) => {
     let routes = [];
 
     try {
-        routes = await fetchAPIDocs(process.env.FALL_OF_THE_GODS_PATH);
+        routes = await fetchAPIDocs(process.env.HERALDS_OF_CHAOS_PATH);
     } catch (error) {
         res.status(500).send(
             new ApiException(

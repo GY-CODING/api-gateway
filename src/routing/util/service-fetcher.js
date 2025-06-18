@@ -8,8 +8,8 @@ function buildPath(request) {
     const service       = "/" + request.url.split('/').slice(1)[0];
 
     switch(service) {
-        case process.env.FALL_OF_THE_GODS_PATH:
-            return `${process.env.FALL_OF_THE_GODS_URL}/${endpoint}`;
+        case process.env.HERALDS_OF_CHAOS_PATH:
+            return `${process.env.HERALDS_OF_CHAOS_URL}/${endpoint}`;
         case process.env.ACCOUNTS_PATH:
             return `${process.env.ACCOUNTS_URL}/${endpoint}`;
         case process.env.MESSAGES_PATH:
@@ -68,20 +68,9 @@ module.exports = async function getResponse(request, userID = undefined) {
     
     let responseBody;
     let responseContentType = response.headers.get('content-type');
-    const contentType = response.headers.get('content-type');
+    let contentType = response.headers.get('content-type');
 
-    if(!contentType) {
-        Log.error({ message: "No content type found in response." });
-
-        return {
-            status: 500,
-            body: new ApiException(
-                "GATEWAY_ERROR",
-                `An internal API Gateway error has occurred, sorry for the inconvenience.`,
-                500
-            ).toJSON()
-        }
-    }
+    if(!contentType) contentType = "text/plain";
 
     if (contentType.includes('application/json')) {
         responseBody = await response.json();
