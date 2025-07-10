@@ -43,7 +43,11 @@ module.exports = async function getResponse(request, userID = undefined) {
     let newHeaders = new Headers();
 
     if(userID === undefined) {
-        newHeaders = new Headers(request.headers);
+        for (const [key, value] of Object.entries(request.headers)) {
+            if (key.toLowerCase() !== 'content-length') {
+                newHeaders.append(key, value);
+            }
+        }
     } else {
         newHeaders.append('x-user-id', userID);
         newHeaders.append('Content-Type', request.headers['content-type']);
@@ -60,7 +64,7 @@ module.exports = async function getResponse(request, userID = undefined) {
             body: JSON.stringify(request.body)
         });
     } catch (error) {
-        Log.error({ message: "An error with the authentication service has occurred: " + newHeaders.entries() });
+        Log.error({ message: "An error with the service fetching service has occurred: " + error.message });
         throw new Error("500");
     }
 
