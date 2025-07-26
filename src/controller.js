@@ -1,4 +1,5 @@
 const express = require('express');
+const ws = require('ws');
 const routeRequest = require('./routing/api-routing.js');
 const fetchAPIDocs = require('./apidocs-fetcher.js');
 const ApiException = require('./entities/api-exception.js');
