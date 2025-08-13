@@ -2,7 +2,6 @@ const express = require('express');
 const routeRequest = require('./routing/api-routing.js');
 const fetchAPIDocs = require('./apidocs-fetcher.js');
 const ApiException = require('./entities/api-exception.js');
-const { createProxyMiddleware } = require('http-proxy-middleware');
 
 require('dotenv').config();
 
@@ -100,17 +99,6 @@ app.all(`${process.env.BOOKS_PATH}/{*splat}`, async (req, res) => {
     res.set('Content-Type', response.contentType);
     res.status(response.status).send(response.body);
 });
-
-app.use('/accounts/docs', createProxyMiddleware({
-    target: 'https://accounts.apidog.io',
-    changeOrigin: true,
-    pathRewrite: {
-        '^/accounts/docs': '',
-    },
-    onProxyReq: (proxyReq, req, res) => {
-        // Optionally add custom headers or logging here
-    }
-}));
 
 app.listen(process.env.PORT, () => {
     console.log(`API Gateway listening on port ${process.env.PORT}`)
