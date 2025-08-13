@@ -1,5 +1,4 @@
 const express = require('express');
-const ws = require('ws');
 const routeRequest = require('./routing/api-routing.js');
 const fetchAPIDocs = require('./apidocs-fetcher.js');
 const ApiException = require('./entities/api-exception.js');
@@ -13,17 +12,6 @@ app.use(express.json({ limit: '30mb' }));
 app.all("/health", (req, res) => {
     res.send("UP");
 });
-
-app.use('/accounts/docs', createProxyMiddleware({
-    target: 'https://accounts.apidog.io',
-    changeOrigin: true,
-    pathRewrite: {
-        '^/accounts/docs': '',
-    },
-    onProxyReq: (proxyReq, req, res) => {
-        // Optionally add custom headers or logging here
-    }
-}));
 
 app.all(`${process.env.HERALDS_OF_CHAOS_PATH}/{*splat}`, async (req, res) => {
     let routes = [];
@@ -48,6 +36,10 @@ app.all(`${process.env.HERALDS_OF_CHAOS_PATH}/{*splat}`, async (req, res) => {
 
 app.all(`${process.env.ACCOUNTS_PATH}/{*splat}`, async (req, res) => {
     let routes = [];
+
+    if(req.path === '/accounts/docs') {
+        
+    }
 
     try {
         routes = await fetchAPIDocs(process.env.ACCOUNTS_PATH);
@@ -108,6 +100,17 @@ app.all(`${process.env.BOOKS_PATH}/{*splat}`, async (req, res) => {
     res.set('Content-Type', response.contentType);
     res.status(response.status).send(response.body);
 });
+
+app.use('/accounts/docs', createProxyMiddleware({
+    target: 'https://accounts.apidog.io',
+    changeOrigin: true,
+    pathRewrite: {
+        '^/accounts/docs': '',
+    },
+    onProxyReq: (proxyReq, req, res) => {
+        // Optionally add custom headers or logging here
+    }
+}));
 
 app.listen(process.env.PORT, () => {
     console.log(`API Gateway listening on port ${process.env.PORT}`)
