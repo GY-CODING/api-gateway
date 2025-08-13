@@ -14,7 +14,7 @@ app.all("/health", (req, res) => {
     res.send("UP");
 });
 
-app.use('/apidocs', createProxyMiddleware({
+app.use('/accounts/docs', createProxyMiddleware({
     target: 'https://accounts.apidog.io',
     changeOrigin: true,
     pathRewrite: {
