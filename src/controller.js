@@ -3,6 +3,7 @@ const ws = require('ws');
 const routeRequest = require('./routing/api-routing.js');
 const fetchAPIDocs = require('./apidocs-fetcher.js');
 const ApiException = require('./entities/api-exception.js');
+const { createProxyMiddleware } = require('http-proxy-middleware');
 
 require('dotenv').config();
 
@@ -12,6 +13,17 @@ app.use(express.json({ limit: '30mb' }));
 app.all("/health", (req, res) => {
     res.send("UP");
 });
+
+app.use('/apidocs', createProxyMiddleware({
+    target: 'https://accounts.apidog.io',
+    changeOrigin: true,
+    pathRewrite: {
+        '^/accounts/docs': '',
+    },
+    onProxyReq: (proxyReq, req, res) => {
+        // Optionally add custom headers or logging here
+    }
+}));
 
 app.all(`${process.env.HERALDS_OF_CHAOS_PATH}/{*splat}`, async (req, res) => {
     let routes = [];
